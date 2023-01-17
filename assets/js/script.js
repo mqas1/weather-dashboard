@@ -147,16 +147,16 @@ const saveCity = (city) => {
 }
 
 const cityList = () => {
-    let storedCities = JSON.parse(localStorage.getItem("cities"));
+    let storedCities = JSON.parse(localStorage.getItem("cities")).reverse();
     if (!storedCities) {
         return
     } else {
-    
-    for (let i = 0; i< storedCities.length; i++) {
-        if (!cityArr.includes(storedCities[i])){
-            cityArr.push(storedCities[i]);
-        }
-    } }
+        for (let i = 0; i< storedCities.length; i++) {
+            if (!cityArr.includes(storedCities[i])){
+                cityArr.push(storedCities[i]);
+            }
+        } 
+    }
     const cityListEl = document.getElementById("city-list");
     for (let j = 0; j < cityArr.length; j++){
         let listItem = document.createElement("li");
