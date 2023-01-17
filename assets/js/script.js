@@ -1,3 +1,4 @@
+// Declaring variables to be used in DOM manipulation in the functions below.
 var deleteBtn = document.getElementById("delete-btn");
 var searchBtn = document.getElementById("search-btn");
 var userInput = document.getElementById("search-input");
@@ -12,14 +13,20 @@ var futureForecastEl = document.getElementById("future-forecast");
 var spinnerEl = document.getElementById("spinner");
 var dataEl = document.getElementById("data-div");
 
+// Declaring arrays that will be used to store data needed for the application.
+// Namely the forecast, and search history, respectively.
 var middayTemp = [];
 var cityArr = [];
 
+// Event listener for deleting search history/local storage.
 deleteBtn.addEventListener("click", () => {
     localStorage.clear();
     location.reload();
 });
 
+// Event listener for the searched city. It ties together all the successive functions,
+// by feeding the searched city to the API calls to get the weather data as well as saving the
+// search result to local storage.
 searchBtn.addEventListener("click", (event) => {
     event.preventDefault();
     clearPage();
@@ -32,6 +39,8 @@ searchBtn.addEventListener("click", (event) => {
     location.reload();
 })
 
+// Function to clear the DOM if there is unwanted data displayed in the browser,
+// i.e, previous weather data.
 const clearPage = () => {
     let clearMainWeather = document.getElementById("weather-card-lg");
 
@@ -44,6 +53,7 @@ const clearPage = () => {
     }
 }
 
+// Function to convert the user search into the geographic coordinates.
 const searchCity = (city) => {
      
 var apiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=c1b997a8a4d7448487ac1de7b291dca2`;
@@ -66,6 +76,7 @@ fetch(apiUrl, {
     })
 }
 
+// Geographic coordinates then fed into second API which then displays the data to the page.
 var getWeather = (lat, lon) => {
 
     apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=c1b997a8a4d7448487ac1de7b291dca2&units=metric`;
@@ -77,12 +88,15 @@ var getWeather = (lat, lon) => {
         })
         .then(function(data){
             for (let i = 0; i < data.list.length; i++) {
-                    
+
+// Filters the JSON response array of 40 results to only show those for 12pm.
+// Pushes these results into the middayTemp array.
                 if (data.list[i].dt_txt.split(" ")[1] === "12:00:00"){
                     middayTemp.push(data.list[i]);
                 } 
             }
 
+// Creates the main/current weather card from the first index in the array.
             let currWeather = document.createElement("div");
             currWeather.setAttribute("class", "card");
             currWeather.setAttribute("id", "weather-card-lg");
@@ -100,6 +114,7 @@ var getWeather = (lat, lon) => {
             futureHeading.textContent = "5-Day Forecast:"
             futureForecastEl.appendChild(futureHeading);
 
+// Loops over the remaining indices to create the further five day forecast
             for (let j = 1; j < middayTemp.length; j++) {
                 let futureCard = document.createElement("div");
                 futureCard.setAttribute("class", "card col-2 mx-1 bg-primary text-light");
@@ -111,6 +126,7 @@ var getWeather = (lat, lon) => {
                 futureForecastEl.appendChild(futureCard);
             }
 
+// As the data does not generate a 6th day, the last card is generated and tells the user that the data is currently unavailable.
             if (middayTemp.length < 6){
                 let errCard = document.createElement("div");
                 errCard.setAttribute("class", "card col-2 mx-1 bg-primary text-light text-center");
@@ -120,6 +136,7 @@ var getWeather = (lat, lon) => {
         }) 
 }
 
+// Function for capitalising user search history.
 const getCityName = () =>{
 
     let cityName = userInput.value.split(" ");
@@ -129,6 +146,7 @@ const getCityName = () =>{
         return cityName.join(" ");
     }
 
+// Once the user search has been capitalised it is then added to local storage as a JSON string.
 const saveCity = (city) => {
     let storedCities = localStorage.getItem("cities");
     if (storedCities !== null) {
@@ -146,6 +164,8 @@ const saveCity = (city) => {
     localStorage.setItem("cities", JSON.stringify(storedCities));
 }
 
+// The JSON string is parsed and an array is created from the stored cities, in reverse order
+// for a more intuitive UI. From this array the search history list is generated.
 const cityList = () => {
     let storedCities = JSON.parse(localStorage.getItem("cities")).reverse();
     if (!storedCities) {
@@ -176,6 +196,8 @@ const cityList = () => {
     }
 }
 
+// Function to display the last search result on the page upon refresh and calls
+// the above search history function.
 const init = () => {
     cityList();   
     let storedCities = JSON.parse(localStorage.getItem("cities"));
