@@ -15,7 +15,7 @@ var dataEl = document.getElementById("data-div");
 
 // Declaring arrays that will be used to store data needed for the application.
 // Namely the forecast, and search history, respectively.
-var middayTemp = [];
+var fiveDayTemp = [];
 var cityArr = [];
 
 // Event listener for deleting search history/local storage.
@@ -34,7 +34,7 @@ searchBtn.addEventListener("click", (event) => {
     displayError.textContent="";
     spinnerEl.classList.remove("invisible");
     spinnerEl.classList.add("visible");
-    middayTemp = [];
+    fiveDayTemp = [];
     saveCity(getCityName(userInput.value));
     location.reload();
 })
@@ -90,46 +90,52 @@ var getWeather = (lat, lon) => {
             for (let i = 0; i < data.list.length; i++) {
 
 // Filters the JSON response array of 40 results to only show those for 12pm.
-// Pushes these results into the middayTemp array.
-                if (data.list[i].dt_txt.split(" ")[1] === "12:00:00"){
-                    middayTemp.push(data.list[i]);
+// Pushes these results into the fiveDayTemp array.
+                if (data.list[i].dt_txt.split(" ")[1] === "00:00:00" &&
+                    data.list[i].dt_txt.split(" ")[0] !== data.list[0].dt_txt.split(" ")[0]){
+                        fiveDayTemp.push(data.list[i]);
                 } 
             }
 
 // Creates the main/current weather card from the first index in the array.
             let currWeather = document.createElement("div");
-            currWeather.setAttribute("class", "card");
+            currWeather.setAttribute("class", "card text-center text-md-start");
             currWeather.setAttribute("id", "weather-card-lg");
             currForecastEl.appendChild(currWeather);
             
-            let cardDate = dayjs(middayTemp[0].dt * 1000).format("D/M/YYYY");
-            let cardIcon = `http://openweathermap.org/img/wn/${middayTemp[0].weather[0].icon}.png`;
+            let cardDate = dayjs(data.list[0].dt * 1000).format("D/M/YYYY");
+            let cardIcon = `http://openweathermap.org/img/wn/${data.list[0].weather[0].icon}.png`;
             currWeather.innerHTML = `<h4>${data.city.name} (${cardDate}) <img src=${cardIcon}></h4>
-                                    <p>Temp: ${middayTemp[0].main.temp}°C</p><p>Wind: ${middayTemp[0].wind.speed} KPH</p>
-                                    <p>Humidity: ${middayTemp[0].main.humidity}%</p>`;
+                                     <p>Temp: ${data.list[0].main.temp}°C</p>
+                                     <p>Wind: ${data.list[0].wind.speed} KPH</p>
+                                     <p>Humidity: ${data.list[0].main.humidity}%</p>`;
             spinnerEl.classList.remove("visible");
             spinnerEl.classList.add("invisible");
 
             let futureHeading = document.createElement("h4");
+            futureHeading.setAttribute("class", "text-center text-md-start");
             futureHeading.textContent = "5-Day Forecast:"
             futureForecastEl.appendChild(futureHeading);
 
 // Loops over the remaining indices to create the further five day forecast
-            for (let j = 1; j < middayTemp.length; j++) {
+            for (let j = 0; j < fiveDayTemp.length; j++) {
                 let futureCard = document.createElement("div");
-                futureCard.setAttribute("class", "card col-2 mx-1 bg-primary text-light");
-                let futureDate = dayjs(middayTemp[j].dt * 1000).format("D/M/YYYY");
-                let futureIcon = `http://openweathermap.org/img/wn/${middayTemp[j].weather[0].icon}.png`;
-                futureCard.innerHTML = `<h5 class="pt-3">${futureDate}<br><img src=${futureIcon}></h5>
-                                        <p>Temp: ${middayTemp[j].main.temp}°C</p><p>Wind: ${middayTemp[j].wind.speed} KPH</p>
-                                        <p>Humidity: ${middayTemp[j].main.humidity}%</p>`;
+                futureCard.setAttribute("class", "card col-sm-2 text-center text-md-start mx-1 bg-primary text-light");
+                let futureDate = dayjs(fiveDayTemp[j].dt * 1000).format("D/M/YYYY");
+                let futureIcon = `http://openweathermap.org/img/wn/${fiveDayTemp[j].weather[0].icon}.png`;
+                futureCard.innerHTML = `<h5 class="pt-3">${futureDate}
+                                        <br>
+                                        <img src=${futureIcon}></h5>
+                                        <p>Temp: ${fiveDayTemp[j].main.temp}°C</p>
+                                        <p>Wind: ${fiveDayTemp[j].wind.speed} KPH</p>
+                                        <p>Humidity: ${fiveDayTemp[j].main.humidity}%</p>`;
                 futureForecastEl.appendChild(futureCard);
             }
 
-// As the data does not generate a 6th day, the last card is generated and tells the user that the data is currently unavailable.
-            if (middayTemp.length < 6){
+// If the data does not generate a 5th day, the last card is generated and tells the user that the data is currently unavailable.
+            if (fiveDayTemp.length < 5){
                 let errCard = document.createElement("div");
-                errCard.setAttribute("class", "card col-2 mx-1 bg-primary text-light text-center");
+                errCard.setAttribute("class", "card mx-1 bg-primary text-light text-center");
                 futureForecastEl.appendChild(errCard);
                 errCard.innerHTML = `<h5 class="py-3">Data currently unavailable</h5>`;
             }
@@ -141,7 +147,7 @@ const getCityName = () =>{
 
     let cityName = userInput.value.split(" ");
     for (let x = 0; x < cityName.length; x++){
-        cityName[x] = cityName[x][0].toUpperCase() + cityName[x].substr(1);
+        cityName[x] = cityName[x][0].toUpperCase() + cityName[x].substr(1).toLowerCase();
     }
         return cityName.join(" ");
     }
@@ -180,7 +186,7 @@ const cityList = () => {
     const cityListEl = document.getElementById("city-list");
     for (let j = 0; j < cityArr.length; j++){
         let listItem = document.createElement("li");
-        listItem.setAttribute("class", "list-group-item");
+        listItem.setAttribute("class", "list-group-item text-center text-md-start");
         listItem.textContent = cityArr[j];
         cityListEl.appendChild(listItem);
 
@@ -188,7 +194,7 @@ const cityList = () => {
             let element = event.target;
             if (element.matches("li") === true){
                 clearPage();
-                middayTemp = [];
+                fiveDayTemp = [];
                 searchCity(listItem.textContent);
                 displayError.textContent="";
             }

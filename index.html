@@ -21,13 +21,13 @@
 </head>
 <body>
     <header class="p-3 text-light">
-        <h1>Weather Dashboard</h1>
+        <h1 class="text-center text-md-start">Weather Dashboard</h1>
     </header>
     <div class="d-md-flex vh-100">
         <div class="bg-light col-auto p-3">
-            <h3>Search for a City:</h3>
+            <h3 class="text-center text-md-start">Search for a City:</h3>
             <form>
-                <div class="row" id="search-div">
+                <div class="row justify-content-center justify-content-md-start" id="search-div">
                     <div class="col-auto d-flex">
                         <input class="form-control mx-1" id="search-input" type="text" placeholder="search...">
                         <button class="btn btn-primary mb-3 mx-1" id="search-btn"><i class="bi bi-search"></i></button>
@@ -40,7 +40,7 @@
         <div class="p-3" id="data-div">
             <div class="spinner-border invisible" role="status" id="spinner"></div>
             <div class="row p-3" id="current-forecast"></div>
-            <div class="row p-3 justify-content-evenly" id="future-forecast">
+            <div class="row p-3 justify-content-evenly g-3" id="future-forecast">
         </div>
     </div>
 
