@@ -103,7 +103,7 @@ var getWeather = (lat, lon) => {
             currWeather.setAttribute("id", "weather-card-lg");
             currForecastEl.appendChild(currWeather);
             
-            let cardDate = dayjs(data.list[0].dt * 1000).format("D/M/YYYY");
+            let cardDate = dayjs(data.list[0].dt_txt.split(" ")[0]).format("D/M/YYYY");
             let cardIcon = `http://openweathermap.org/img/wn/${data.list[0].weather[0].icon}.png`;
             currWeather.innerHTML = `<h4>${data.city.name} (${cardDate}) <img src=${cardIcon}></h4>
                                      <p>Temp: ${data.list[0].main.temp}°C</p>
@@ -121,7 +121,7 @@ var getWeather = (lat, lon) => {
             for (let j = 0; j < fiveDayTemp.length; j++) {
                 let futureCard = document.createElement("div");
                 futureCard.setAttribute("class", "card col-sm-2 text-center text-md-start mx-1 bg-primary text-light");
-                let futureDate = dayjs(fiveDayTemp[j].dt * 1000).format("D/M/YYYY");
+                let futureDate = dayjs(fiveDayTemp[j].dt_txt.split(" ")[0]).format("D/M/YYYY");
                 let futureIcon = `http://openweathermap.org/img/wn/${fiveDayTemp[j].weather[0].icon}.png`;
                 futureCard.innerHTML = `<h5 class="pt-3">${futureDate}
                                         <br>
